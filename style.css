@@ -1,0 +1,97 @@
+/* ===== PAGE VISIBILITY ===== */
+.page { display: none; }
+.page.active { display: block; }
+
+/* Auth-based visibility */
+body.not-authenticated .role-logged-in { display: none; }
+body.authenticated .role-logged-out { display: none; }
+
+/* Admin-only elements */
+.role-admin { display: none; }
+body.is-admin .role-admin { display: block; }
+
+/* ===== GENERAL ===== */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+
+/* ===== ALERTS ===== */
+.alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+.alert-info code {
+  background-color: #c7e6ec;
+  color: #0c5460;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* ===== BUTTONS ===== */
+#getStartedBtn {
+  font-size: 1.05rem;
+  padding: 10px 24px;
+}
+
+/* ===== TABLES ===== */
+.table th { font-weight: 600; }
+
+/* ===== CARD FORM PANELS ===== */
+.card-header.bg-light {
+  font-weight: 600;
+}
+
+/* ===== MODAL ===== */
+#reqItemsList .input-group {
+  margin-bottom: 8px;
+}
+
+/* ===== PROFILE PAGE (Phase 5) ===== */
+.profile-card {
+  max-width: 540px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+}
+
+.profile-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.profile-field {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.profile-label {
+  font-weight: 600;
+  margin-right: 0.4rem;
+}
+
+/* ===== REQUESTS PAGE (Phase 7) ===== */
+.req-items-cell {
+  font-size: 0.9rem;
+  max-width: 280px;
+}
+
+/* Status badge sizing consistency */
+#requestTableBody .badge {
+  font-size: 0.8rem;
+  padding: 0.35em 0.65em;
+}
+
+/* Pending = soft yellow text readable */
+.badge.bg-warning.text-dark {
+  color: #664d03 !important;
+}
+
+/* Empty state centering */
+#requestsEmpty {
+  padding: 3rem 0;
+}
