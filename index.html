@@ -12,7 +12,7 @@
   <!-- ===== NAVBAR ===== -->
   <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">Full-Stack App (Hanz Joshua Bunado)</span>
+      <span class="navbar-brand mb-0 h1">Full-Stack App (Your Full Name)</span>
       <div class="d-flex align-items-center">
         <!-- Shown when NOT logged in -->
         <a href="#" class="nav-link text-light me-3 role-logged-out" id="navLoginLink">Login</a>
@@ -42,67 +42,89 @@
     <!-- HOME -->
     <section id="page-home" class="page">
       <h1 class="mb-3">Welcome to Full-Stack App</h1>
-      <p class="lead">A static prototype before backend integration. Simulates:</p>
+      <p class="lead">A client-side prototype that simulates a full-stack app:</p>
       <ul>
-        <li>Email registration + fake verification</li>
-        <li>Login with JWT-like token simulation</li>
-        <li>Role-based UI (Admin/User)</li>
-        <li>CRUD for Employees, Departments, Requests</li>
+        <li>Email registration with simulated verification</li>
+        <li>Session persistence via <code>localStorage</code> token</li>
+        <li>Role-based UI — Admin sees Employees, Departments, Accounts</li>
+        <li>Employee CRUD, Department management, User requests</li>
       </ul>
       <div class="alert alert-info">
-        ⚠️ <strong>Note:</strong> All data is stored in <code>localStorage</code>. Refresh to reset.
+        💾 <strong>Data persists across refreshes</strong> using <code>localStorage</code>
+        (<code>ipt_demo_v1</code>).
+        Default admin: <code>admin@example.com</code> / <code>Password123!</code>
       </div>
-      <button class="btn btn-primary" id="getStartedBtn">Get Started →</button>
+      <button class="btn btn-primary btn-lg" id="getStartedBtn">Get Started →</button>
     </section>
 
     <!-- REGISTER -->
     <section id="page-register" class="page">
-      <h2 class="mb-3">Register Account</h2>
-      <div id="regError" class="alert alert-danger d-none"></div>
-      <div class="mb-3">
-        <label class="form-label">First Name</label>
-        <input type="text" class="form-control" id="regFirstName">
+      <div class="auth-form-wrap">
+        <h2 class="mb-4">Create Account</h2>
+        <div id="regError" class="alert alert-danger d-none"></div>
+        <div class="row mb-3">
+          <div class="col">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-control" id="regFirstName" autocomplete="given-name">
+          </div>
+          <div class="col">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-control" id="regLastName" autocomplete="family-name">
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="regEmail" autocomplete="email">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="regPassword" autocomplete="new-password">
+          <div class="form-text">Minimum 6 characters.</div>
+        </div>
+        <button class="btn btn-success w-100 mb-3" id="signUpBtn">Sign Up</button>
+        <p class="text-center text-muted mb-0">
+          Already have an account?
+          <a href="#" data-page="login" class="text-decoration-none">Log in</a>
+        </p>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Last Name</label>
-        <input type="text" class="form-control" id="regLastName">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-control" id="regEmail">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input type="password" class="form-control" id="regPassword">
-      </div>
-      <button class="btn btn-success me-2" id="signUpBtn">Sign Up</button>
-      <button class="btn btn-outline-secondary" data-page="home">Cancel</button>
     </section>
 
     <!-- VERIFY EMAIL -->
     <section id="page-verify" class="page">
-      <h2 class="mb-3">Verify Your Email</h2>
-      <div class="alert alert-success" id="verifyMsg">✅ A verification link has been sent to <span id="verifyEmail"></span>.</div>
-      <p>For demo purposes, click below to simulate verification:</p>
-      <button class="btn btn-success me-2" id="simulateVerifyBtn">✅ Simulate Email Verification</button>
-      <button class="btn btn-outline-secondary" data-page="login">Go to Login</button>
+      <div class="auth-form-wrap">
+        <h2 class="mb-4">Check Your Email</h2>
+        <div class="alert alert-success mb-4">
+          📧 A verification link has been sent to <strong><span id="verifyEmail"></span></strong>.
+        </div>
+        <p class="text-muted mb-4">
+          In a real app you'd click the link in your inbox.
+          For this demo, click the button below to simulate it.
+        </p>
+        <button class="btn btn-success w-100 mb-3" id="simulateVerifyBtn">✅ Simulate Email Verification</button>
+        <button class="btn btn-outline-secondary w-100" data-page="login">Go to Login</button>
+      </div>
     </section>
 
     <!-- LOGIN -->
     <section id="page-login" class="page">
-      <div id="loginVerifiedAlert" class="alert alert-success d-none">✅ Email verified! You may now log in.</div>
-      <h2 class="mb-3">Login</h2>
-      <div class="mb-3">
-        <label class="form-label">Email</label>
-        <input type="email" class="form-control" id="loginEmail">
+      <div class="auth-form-wrap">
+        <div id="loginVerifiedAlert" class="alert alert-success d-none">✅ Email verified! You can now log in.</div>
+        <h2 class="mb-4">Login</h2>
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="loginEmail" autocomplete="email">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-control" id="loginPassword" autocomplete="current-password">
+        </div>
+        <div id="loginError" class="alert alert-danger d-none"></div>
+        <button class="btn btn-primary w-100 mb-3" id="loginBtn">Login</button>
+        <p class="text-center text-muted mb-0">
+          Don't have an account?
+          <a href="#" data-page="register" class="text-decoration-none">Register</a>
+        </p>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Password</label>
-        <input type="password" class="form-control" id="loginPassword">
-      </div>
-      <div id="loginError" class="alert alert-danger d-none"></div>
-      <button class="btn btn-primary me-2" id="loginBtn">Login</button>
-      <button class="btn btn-outline-secondary" data-page="home">Cancel</button>
     </section>
 
     <!-- PROFILE -->

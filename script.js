@@ -13,7 +13,8 @@ function loadFromStorage() {
     if (raw) {
       const parsed = JSON.parse(raw);
       // Validate structure has all required keys
-      if (parsed.accounts && parsed.departments && parsed.employees && parsed.requests) {
+      if (Array.isArray(parsed.accounts) && Array.isArray(parsed.departments) &&
+          Array.isArray(parsed.employees) && Array.isArray(parsed.requests)) {
         window.db = parsed;
         return;
       }
@@ -38,6 +39,7 @@ function loadFromStorage() {
     employees: [],
     requests:  [],
   };
+  console.info('[Storage] Seeded fresh database.');
 
   saveToStorage();
 }
@@ -61,16 +63,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   requestModal = new bootstrap.Modal(document.getElementById('requestModal'));
 
-  // Restore session via auth_token
+  // Restore session via auth_token – always read from freshly-loaded window.db
   const token = localStorage.getItem('auth_token');
   if (token) {
-    const user = window.db.accounts.find(a => a.email === token);
-    if (user) setAuthState(true, user);
+    const user = window.db.accounts.find(a => a.email === token && a.verified === true);
+    if (user) {
+      setAuthState(true, user);
+    } else {
+      // Token refers to a deleted or unverified account – clear it
+      localStorage.removeItem('auth_token');
+    }
   }
 
-  // Set default hash if none, then run routing
-  if (!window.location.hash) {
-    window.location.hash = '#/';
+  // Set default hash if none (setting hash fires hashchange → handleRouting).
+  // If hash already exists, hashchange won't fire so call handleRouting directly.
+  if (!window.location.hash || window.location.hash === '#') {
+    window.location.hash = '#/';   // triggers hashchange → handleRouting
   } else {
     handleRouting();
   }
@@ -117,6 +125,11 @@ function handleRouting() {
   if (ADMIN_ROUTES.includes(hash) && (!currentUser || currentUser.role !== 'admin')) {
     navigateTo(currentUser ? '#/' : '#/login');
     return;
+  }
+
+  // Hide login verified banner whenever leaving the login page
+  if (hash !== '#/login') {
+    document.getElementById('loginVerifiedAlert').classList.add('d-none');
   }
 
   // --- Show matching page ---
@@ -173,10 +186,11 @@ function bindEvents() {
     e.preventDefault(); navigateTo('#/register');
   });
 
-  // Logout
+  // Logout – clear all session artefacts
   document.getElementById('logoutBtn').addEventListener('click', e => {
     e.preventDefault();
     localStorage.removeItem('auth_token');
+    localStorage.removeItem('unverified_email');
     setAuthState(false);
     navigateTo('#/');
   });
@@ -195,14 +209,22 @@ function bindEvents() {
     navigateTo(currentUser ? '#/profile' : '#/login');
   });
 
-  // Register
+  // Register – button click and Enter key in password field
   document.getElementById('signUpBtn').addEventListener('click', handleRegister);
+  document.getElementById('regPassword').addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleRegister();
+  });
 
   // Verify
   document.getElementById('simulateVerifyBtn').addEventListener('click', handleSimulateVerify);
 
-  // Login
+  // Login – button click and Enter key in either field
   document.getElementById('loginBtn').addEventListener('click', handleLogin);
+  ['loginEmail', 'loginPassword'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  });
 
   // Profile edit – listener is attached inside renderProfile() to avoid stale closures
 
@@ -324,9 +346,6 @@ function handleLogin() {
   navigateTo('#/profile');
 }
 
-// ===================================================
-//  PROFILE
-// ===================================================
 // ===================================================
 //  PROFILE  (Phase 5)
 // ===================================================
@@ -709,12 +728,12 @@ function renderRequestsList() {
   const tbody    = document.getElementById('requestTableBody');
 
   if (mine.length === 0) {
-    emptyDiv.classList.remove('d-none');
+    emptyDiv.style.display = '';    // visible
     table.classList.add('d-none');
     return;
   }
 
-  emptyDiv.classList.add('d-none');
+  emptyDiv.style.display = 'none'; // hidden
   table.classList.remove('d-none');
 
   // Sort newest first
