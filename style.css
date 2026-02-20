@@ -9,11 +9,11 @@ body.authenticated .role-logged-out { display: none; }
 /* Admin-only elements */
 .role-admin { display: none !important; }
 body.is-admin .role-admin { display: revert !important; }
-/* Specifically fix dropdown <li> items which need list-item not block */
+/* fix dropdown */
 body.is-admin li.role-admin { display: list-item !important; }
 body.is-admin a.role-admin  { display: block !important; }
 
-/* ===== GENERAL ===== */
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
@@ -44,17 +44,17 @@ body {
 /* ===== TABLES ===== */
 .table th { font-weight: 600; }
 
-/* ===== CARD FORM PANELS ===== */
+/* ===== CARD ===== */
 .card-header.bg-light {
   font-weight: 600;
 }
 
-/* ===== MODAL ===== */
+
 #reqItemsList .input-group {
   margin-bottom: 8px;
 }
 
-/* ===== PROFILE PAGE (Phase 5) ===== */
+/* ===== PROFILE(Phase 5 ish) ===== */
 .profile-card {
   max-width: 540px;
   border: 1px solid #dee2e6;
@@ -77,19 +77,19 @@ body {
   margin-right: 0.4rem;
 }
 
-/* ===== REQUESTS PAGE (Phase 7) ===== */
+/* ====(Phase 7)==== */
 .req-items-cell {
   font-size: 0.9rem;
   max-width: 280px;
 }
 
-/* Status badge sizing consistency */
+
 #requestTableBody .badge {
   font-size: 0.8rem;
   padding: 0.35em 0.65em;
 }
 
-/* Pending = soft yellow text readable */
+
 .badge.bg-warning.text-dark {
   color: #664d03 !important;
 }
@@ -106,7 +106,7 @@ body {
   padding: 2rem 0;
 }
 
-/* Give admin table action columns a bit more breathing room */
+/* space gaps */
 .table td:last-child {
   white-space: nowrap;
 }

@@ -2,9 +2,9 @@
 //  FULL-STACK APP  –  script.js
 // ===================================================
 
-// ===================================================
+
 //  STORAGE  (Phase 4)
-// ===================================================
+
 const STORAGE_KEY = 'ipt_demo_v1';
 
 function loadFromStorage() {
@@ -23,7 +23,7 @@ function loadFromStorage() {
     console.warn('Storage corrupt or missing – seeding defaults.', e);
   }
 
-  // Missing or corrupt: seed fresh defaults
+ 
   window.db = {
     accounts: [
       {
@@ -51,7 +51,7 @@ function saveToStorage() {
 // ===================================================
 //  APP STATE
 // ===================================================
-let currentUser = null;   // { firstName, lastName, email, password, role, verified }
+let currentUser = null;   
 let requestModal;
 
 // ===================================================
@@ -75,8 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Set default hash if none (setting hash fires hashchange → handleRouting).
-  // If hash already exists, hashchange won't fire so call handleRouting directly.
+ //hash
   if (!window.location.hash || window.location.hash === '#') {
     window.location.hash = '#/';   // triggers hashchange → handleRouting
   } else {
@@ -743,8 +742,8 @@ function renderRequestsList() {
     createBtn.classList.add('d-none');    // Hide "Create One" for admin
   } else {
     heading.textContent = 'My Requests';
-    newBtn.classList.remove('d-none');    // Show for regular users
-    createBtn.classList.remove('d-none'); // Show for regular users
+    newBtn.classList.remove('d-none');    
+    createBtn.classList.remove('d-none'); // area Shown for regular users
   }
 
   // Update table header for admin (add Submitter column)
