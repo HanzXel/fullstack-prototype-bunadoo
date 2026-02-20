@@ -343,6 +343,7 @@ function handleLogin() {
   document.getElementById('loginPassword').value = '';
   document.getElementById('loginVerifiedAlert').classList.add('d-none');
 
+  // Always send authenticated users to profile (both admin and regular users)
   navigateTo('#/profile');
 }
 
@@ -718,18 +719,56 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-/** Master render – only shows requests belonging to currentUser.email */
+/** Master render – admins see ALL requests, users see only their own */
 function renderRequestsList() {
-  const mine     = window.db.requests.filter(
-    r => r.employeeEmail === (currentUser && currentUser.email)
-  );
+  const isAdmin = currentUser && currentUser.role === 'admin';
+  
+  // Admin sees all requests; regular user sees only their own
+  const requests = isAdmin
+    ? window.db.requests
+    : window.db.requests.filter(r => r.employeeEmail === currentUser?.email);
+
   const emptyDiv = document.getElementById('requestsEmpty');
   const table    = document.getElementById('requestsTable');
   const tbody    = document.getElementById('requestTableBody');
 
-  if (mine.length === 0) {
+  // Update heading and button visibility based on role
+  const heading = document.getElementById('requestsHeading');
+  const newBtn  = document.getElementById('newRequestBtn');
+  const createBtn = document.getElementById('createOneBtn');
+  
+  if (isAdmin) {
+    heading.textContent = 'All Requests';
+    newBtn.classList.add('d-none');       // Hide "+ New Request" for admin
+    createBtn.classList.add('d-none');    // Hide "Create One" for admin
+  } else {
+    heading.textContent = 'My Requests';
+    newBtn.classList.remove('d-none');    // Show for regular users
+    createBtn.classList.remove('d-none'); // Show for regular users
+  }
+
+  // Update table header for admin (add Submitter column)
+  const tableHead = document.querySelector('#requestsTable thead tr');
+  if (isAdmin) {
+    // Check if Submitter column already exists
+    if (!tableHead.querySelector('.submitter-col')) {
+      const submitterTh = document.createElement('th');
+      submitterTh.className = 'submitter-col';
+      submitterTh.textContent = 'Submitter';
+      tableHead.insertBefore(submitterTh, tableHead.children[1]); // After Date
+    }
+  } else {
+    // Remove Submitter column if it exists
+    const submitterCol = tableHead.querySelector('.submitter-col');
+    if (submitterCol) submitterCol.remove();
+  }
+
+  if (requests.length === 0) {
     emptyDiv.style.display = '';    // visible
     table.classList.add('d-none');
+    // Adjust empty message for admins
+    document.getElementById('requestsEmptyText').textContent = 
+      isAdmin ? 'No requests submitted yet.' : 'You have no requests yet.';
     return;
   }
 
@@ -737,24 +776,55 @@ function renderRequestsList() {
   table.classList.remove('d-none');
 
   // Sort newest first
-  const sorted = [...mine].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sorted = [...requests].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   tbody.innerHTML = sorted.map((r) => {
-    // Find the real index in window.db.requests for deletion
+    // Find the real index in window.db.requests
     const globalIdx = window.db.requests.indexOf(r);
     const itemsSummary = r.items
       .map(it => `${it.name} <span class="text-muted">×${it.qty}</span>`)
       .join(', ');
+    
+    // Get submitter name for admin view
+    const submitter = window.db.accounts.find(a => a.email === r.employeeEmail);
+    const submitterName = submitter 
+      ? `${submitter.firstName} ${submitter.lastName}`
+      : r.employeeEmail;
+
+    // Admin sees Approve/Reject buttons; user sees Delete button
+    let actionButtons = '';
+    if (isAdmin) {
+      if (r.status === 'Pending') {
+        actionButtons = `
+          <button class="btn btn-sm btn-success me-1" 
+                  onclick="approveRequest(${globalIdx})" title="Approve">
+            <span class="d-none d-md-inline">Approve</span>
+            <span class="d-inline d-md-none">✓</span>
+          </button>
+          <button class="btn btn-sm btn-danger" 
+                  onclick="rejectRequest(${globalIdx})" title="Reject">
+            <span class="d-none d-md-inline">Reject</span>
+            <span class="d-inline d-md-none">✗</span>
+          </button>`;
+      } else {
+        // Already approved/rejected – show status only
+        actionButtons = `<span class="text-muted small fst-italic">${r.status}</span>`;
+      }
+    } else {
+      // Regular user can delete their own requests
+      actionButtons = `
+        <button class="btn btn-sm btn-outline-danger" 
+                onclick="deleteRequest(${globalIdx})">Delete</button>`;
+    }
+
     return `
       <tr>
         <td class="text-nowrap">${fmtDate(r.date)}</td>
+        ${isAdmin ? `<td>${submitterName}</td>` : ''}
         <td>${r.type}</td>
         <td class="req-items-cell">${itemsSummary}</td>
         <td class="text-center">${statusBadge(r.status)}</td>
-        <td>
-          <button class="btn btn-sm btn-outline-danger"
-                  onclick="deleteRequest(${globalIdx})">Delete</button>
-        </td>
+        <td class="text-nowrap">${actionButtons}</td>
       </tr>`;
   }).join('');
 }
@@ -858,6 +928,32 @@ function deleteRequest(globalIdx) {
   if (!r) return;
   if (!confirm(`Delete this ${r.type} request from ${fmtDate(r.date)}?`)) return;
   window.db.requests.splice(globalIdx, 1);
+  saveToStorage();
+  renderRequestsList();
+}
+
+/** Admin approves a request */
+function approveRequest(globalIdx) {
+  const r = window.db.requests[globalIdx];
+  if (!r) return;
+  if (!currentUser || currentUser.role !== 'admin') {
+    return alert('Only admins can approve requests.');
+  }
+  if (!confirm(`Approve this ${r.type} request?`)) return;
+  window.db.requests[globalIdx].status = 'Approved';
+  saveToStorage();
+  renderRequestsList();
+}
+
+/** Admin rejects a request */
+function rejectRequest(globalIdx) {
+  const r = window.db.requests[globalIdx];
+  if (!r) return;
+  if (!currentUser || currentUser.role !== 'admin') {
+    return alert('Only admins can reject requests.');
+  }
+  if (!confirm(`Reject this ${r.type} request?`)) return;
+  window.db.requests[globalIdx].status = 'Rejected';
   saveToStorage();
   renderRequestsList();
 }

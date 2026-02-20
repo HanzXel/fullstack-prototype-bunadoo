@@ -12,7 +12,7 @@
   <!-- ===== NAVBAR ===== -->
   <nav class="navbar navbar-dark bg-dark">
     <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">Full-Stack App (Your Full Name)</span>
+      <span class="navbar-brand mb-0 h1">Full-Stack App (Hanz Joshua Bunado)</span>
       <div class="d-flex align-items-center">
         <!-- Shown when NOT logged in -->
         <a href="#" class="nav-link text-light me-3 role-logged-out" id="navLoginLink">Login</a>
@@ -148,7 +148,7 @@
     </section>
 
     <!-- EMPLOYEES (admin) -->
-    <section id="page-employees" class="page role-admin">
+    <section id="page-employees" class="page">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Employees</h2>
         <button class="btn btn-success" id="addEmployeeBtn">+ Add Employee</button>
@@ -193,7 +193,7 @@
     </section>
 
     <!-- DEPARTMENTS (admin) -->
-    <section id="page-departments" class="page role-admin">
+    <section id="page-departments" class="page">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Departments</h2>
         <button class="btn btn-success" id="addDeptBtn">+ Add Department</button>
@@ -224,7 +224,7 @@
     </section>
 
     <!-- ACCOUNTS (admin) -->
-    <section id="page-accounts" class="page role-admin">
+    <section id="page-accounts" class="page">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Accounts</h2>
         <button class="btn btn-success" id="addAccountBtn">+ Add Account</button>
@@ -279,21 +279,22 @@
     <!-- REQUESTS -->
     <section id="page-requests" class="page">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>My Requests</h2>
+        <h2 id="requestsHeading">My Requests</h2>
         <button class="btn btn-success" id="newRequestBtn">+ New Request</button>
       </div>
 
       <!-- Empty state -->
       <div id="requestsEmpty" class="text-center py-5">
-        <p class="text-muted fs-5 mb-3">You have no requests yet.</p>
+        <p class="text-muted fs-5 mb-3" id="requestsEmptyText">You have no requests yet.</p>
         <button class="btn btn-success" id="createOneBtn">Create One</button>
       </div>
 
       <!-- Requests table -->
       <table class="table table-bordered table-hover d-none" id="requestsTable">
-        <thead class="table-dark">
+        <thead class="table-dark" id="requestsTableHead">
           <tr>
             <th>Date</th>
+            <!-- Submitter column added dynamically by JS for admin -->
             <th>Type</th>
             <th>Items</th>
             <th class="text-center">Status</th>
